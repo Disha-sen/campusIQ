@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Sample Student Data Import XML
+    Use this format to import student records into the system
+    Fields marked as (Required) must be present for successful import
+-->
+<StudentData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="schemas/student.xsd">
+    
+    <!-- Sample Student 1 -->
+    <Student>
+        <StudentID>EN2024001</StudentID>
+        <Name>Rahul Sharma</Name>
+        <Email>rahul.sharma@student.edu</Email>
+        <Phone>9876543210</Phone>
+        <DateOfBirth>2004-05-15</DateOfBirth>
+        <Gender>male</Gender>
+        <Semester>3</Semester>
+        <Branch>Computer Science</Branch>
+        <AdmissionYear>2024</AdmissionYear>
+        <Batch>2024-28</Batch>
+        <GuardianName>Mr. Suresh Sharma</GuardianName>
+        <GuardianPhone>9876501234</GuardianPhone>
+    </Student>
+    
+    <!-- Sample Student 2 -->
+    <Student>
+        <StudentID>EN2024002</StudentID>
+        <Name>Priya Patel</Name>
+        <Email>priya.patel@student.edu</Email>
+        <Phone>9876543211</Phone>
+        <DateOfBirth>2004-08-22</DateOfBirth>
+        <Gender>female</Gender>
+        <Semester>3</Semester>
+        <Branch>Information Technology</Branch>
+        <AdmissionYear>2024</AdmissionYear>
+        <Batch>2024-28</Batch>
+        <GuardianName>Mr. Ramesh Patel</GuardianName>
+        <GuardianPhone>9876501235</GuardianPhone>
+    </Student>
+    
+    <!-- Sample Student 3 - Minimal Required Fields -->
+    <Student>
+        <StudentID>EN2024003</StudentID>
+        <Name>Amit Kumar</Name>
+        <Email>amit.kumar@student.edu</Email>
+    </Student>
+    
+    <!-- Sample Student 4 -->
+    <Student>
+        <StudentID>EN2024004</StudentID>
+        <Name>Sneha Gupta</Name>
+        <Email>sneha.gupta@student.edu</Email>
+        <Phone>9876543213</Phone>
+        <Gender>female</Gender>
+        <Semester>5</Semester>
+        <Branch>Electronics</Branch>
+    </Student>
+    
+    <!-- Sample Student 5 -->
+    <Student>
+        <StudentID>EN2024005</StudentID>
+        <Name>Vikram Singh</Name>
+        <Email>vikram.singh@student.edu</Email>
+        <Phone>9876543214</Phone>
+        <DateOfBirth>2003-12-10</DateOfBirth>
+        <Gender>male</Gender>
+        <Semester>7</Semester>
+        <Branch>Mechanical Engineering</Branch>
+        <AdmissionYear>2021</AdmissionYear>
+        <Batch>2021-25</Batch>
+    </Student>
+    
+</StudentData>

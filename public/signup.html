@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CampusIQ - Campus Intelligence & Analytics Platform - Sign Up">
+    <meta name="author" content="Disha Sen">
+    <title>CampusIQ - Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .signup-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .signup-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .signup-logo {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 30px var(--primary-glow));
+            animation: pulse3D 3s ease-in-out infinite;
+        }
+        @keyframes pulse3D {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .signup-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .signup-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .role-btn {
+            flex: 1;
+            padding: 1.25rem;
+            border: 2px solid var(--border-color);
+            background: rgba(0,0,0,0.2);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .role-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-4px);
+        }
+        .role-btn.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
+            color: var(--primary-light);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+        .role-btn-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .role-btn-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+        .password-strength {
+            height: 4px;
+            background: var(--bg-dark);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+        .strength-weak { width: 33%; background: var(--danger); }
+        .strength-medium { width: 66%; background: var(--warning); }
+        .strength-strong { width: 100%; background: var(--success); }
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .login-link a {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+        .hidden-field {
+            display: none;
+        }
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .role-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    
+    <div class="signup-container">
+        <div class="signup-card">
+            <div class="signup-header">
+                <div class="signup-logo">📊</div>
+                <h1 class="signup-title">Create Account</h1>
+                <p class="signup-subtitle">Join the Educational Data Analytics System</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <button type="button" class="role-btn active" data-role="student">
+                    <span class="role-btn-icon">🎓</span>
+                    <span class="role-btn-text">Student</span>
+                </button>
+                <button type="button" class="role-btn" data-role="faculty">
+                    <span class="role-btn-icon">👨‍🏫</span>
+                    <span class="role-btn-text">Faculty</span>
+                </button>
+            </div>
+
+            <form id="signupForm">
+                <input type="hidden" id="role" name="role" value="student">
+
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <div class="section-title">Personal Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" class="form-input" placeholder="John" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" class="form-input" placeholder="Doe" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="9876543210" pattern="[0-9]{10}" required>
+                    </div>
+                </div>
+
+                <!-- Student-specific fields -->
+                <div class="form-section" id="studentFields">
+                    <div class="section-title">Academic Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="enrollmentNumber">Enrollment Number <span style="color: var(--text-muted); font-weight: normal;">(Optional - Auto-generated if empty)</span></label>
+                            <input type="text" id="enrollmentNumber" name="enrollmentNumber" class="form-input" placeholder="Leave empty to auto-generate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select id="gender" name="gender" class="form-select">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="courseId">Course *</label>
+                            <select id="courseId" name="courseId" class="form-select" required>
+                                <option value="">Select Course</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="currentSemester">Current Semester *</label>
+                            <select id="currentSemester" name="currentSemester" class="form-select">
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="admissionYear">Admission Year *</label>
+                            <select id="admissionYear" name="admissionYear" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faculty-specific fields -->
+                <div class="form-section hidden-field" id="facultyFields">
+                    <div class="section-title">Professional Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="employeeId">Employee ID <span style="color: var(--text-muted); font-weight: normal;">(Optional - Auto-generated if empty)</span></label>
+                            <input type="text" id="employeeId" name="employeeId" class="form-input" placeholder="Leave empty to auto-generate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="departmentId">Department *</label>
+                            <select id="departmentId" name="departmentId" class="form-select" required>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="designation">Designation *</label>
+                            <select id="designation" name="designation" class="form-select" required>
+                                <option value="">Select Designation</option>
+                                <option value="Professor">Professor</option>
+                                <option value="Associate Professor">Associate Professor</option>
+                                <option value="Assistant Professor">Assistant Professor</option>
+                                <option value="Lecturer">Lecturer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="qualification">Qualification</label>
+                            <input type="text" id="qualification" name="qualification" class="form-input" placeholder="Ph.D., M.Tech, etc.">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="specialization">Specialization</label>
+                        <input type="text" id="specialization" name="specialization" class="form-input" placeholder="Machine Learning, Database Systems, etc.">
+                    </div>
+                </div>
+
+                <!-- Password Section -->
+                <div class="form-section">
+                    <div class="section-title">Security</div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password *</label>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Min 8 characters" minlength="8" required>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="Repeat your password" required>
+                    </div>
+                </div>
+
+                <div id="signupError" class="alert alert-danger hidden"></div>
+                <div id="signupSuccess" class="alert alert-success hidden"></div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="signupBtn">
+                    <span>Create Account</span>
+                    <span>→</span>
+                </button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="/index.html">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Populate year dropdown
+        const yearSelect = document.getElementById('admissionYear');
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= currentYear - 6; y--) {
+            const option = document.createElement('option');
+            option.value = y;
+            option.textContent = y;
+            yearSelect.appendChild(option);
+        }
+
+        // Load courses and departments
+        async function loadFormData() {
+            try {
+                const [coursesRes, deptsRes] = await Promise.all([
+                    fetch('/api/auth/courses'),
+                    fetch('/api/auth/departments')
+                ]);
+                
+                const courses = await coursesRes.json();
+                const departments = await deptsRes.json();
+                
+                const courseSelect = document.getElementById('courseId');
+                const deptSelect = document.getElementById('departmentId');
+                
+                if (courses.success) {
+                    courses.data.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.course_id;
+                        opt.textContent = `${c.course_name} (${c.course_code})`;
+                        courseSelect.appendChild(opt);
+                    });
+                }
+                
+                if (departments.success) {
+                    departments.data.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.department_id;
+                        opt.textContent = `${d.department_name} (${d.department_code})`;
+                        deptSelect.appendChild(opt);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load form data:', error);
+            }
+        }
+        loadFormData();
+
+        // Role selection
+        const roleBtns = document.querySelectorAll('.role-btn');
+        const studentFields = document.getElementById('studentFields');
+        const facultyFields = document.getElementById('facultyFields');
+        const roleInput = document.getElementById('role');
+
+        roleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                roleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const role = btn.dataset.role;
+                roleInput.value = role;
+                
+                if (role === 'student') {
+                    studentFields.classList.remove('hidden-field');
+                    facultyFields.classList.add('hidden-field');
+                    // Update required fields - enrollment number is optional (auto-generated)
+                    document.getElementById('enrollmentNumber').required = false;
+                    document.getElementById('employeeId').required = false;
+                    document.getElementById('departmentId').required = false;
+                    document.getElementById('designation').required = false;
+                    document.getElementById('courseId').required = true;
+                } else {
+                    studentFields.classList.add('hidden-field');
+                    facultyFields.classList.remove('hidden-field');
+                    document.getElementById('enrollmentNumber').required = false;
+                    document.getElementById('employeeId').required = false;
+                    document.getElementById('departmentId').required = true;
+                    document.getElementById('designation').required = true;
+                    document.getElementById('courseId').required = false;
+                }
+            });
+        });
+
+        // Password strength checker
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+
+        passwordInput.addEventListener('input', () => {
+            const val = passwordInput.value;
+            strengthBar.className = 'password-strength-bar';
+            
+            if (val.length === 0) {
+                strengthBar.style.width = '0%';
+            } else if (val.length < 6) {
+                strengthBar.classList.add('strength-weak');
+            } else if (val.length < 10 || !/[A-Z]/.test(val) || !/[0-9]/.test(val)) {
+                strengthBar.classList.add('strength-medium');
+            } else {
+                strengthBar.classList.add('strength-strong');
+            }
+        });
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const signupBtn = document.getElementById('signupBtn');
+            const errorDiv = document.getElementById('signupError');
+            const successDiv = document.getElementById('signupSuccess');
+            
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            signupBtn.disabled = true;
+            signupBtn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span>';
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successDiv.textContent = result.message || 'Account created successfully! Redirecting...';
+                    successDiv.classList.remove('hidden');
+                    signupBtn.innerHTML = '<span>✓ Success!</span>';
+                    signupBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    
+                    // Redirect after showing success
+                    setTimeout(() => {
+                        window.location.replace('/index.html?registered=true');
+                    }, 1500);
+                    return; // Don't reset button
+                } else {
+                    errorDiv.textContent = result.message || 'Registration failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = '<span>Create Account</span><span>→</span>';
+            }
+        });
+    </script>
+
+    <!-- Copyright Footer -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2026 <strong>CampusIQ</strong> - Campus Intelligence & Analytics Platform</p>
+            <p class="developer-info">Developed by <strong>Disha Sen</strong> | <a href="mailto:disha0204sen@gmail.com">disha0204sen@gmail.com</a></p>
+            <p class="tech-stack">Built with Node.js • Express • MySQL • Chart.js</p>
+        </div>
+    </footer>
+</body>
+</html>

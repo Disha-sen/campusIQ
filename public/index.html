@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CampusIQ - Intelligent Campus Analytics Platform for Student Performance Tracking">
+    <meta name="author" content="Disha Sen">
+    <meta name="keywords" content="education analytics, student performance, attendance tracking, placement analytics">
+    <title>CampusIQ - Campus Intelligence & Analytics Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Animated Background Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-wrapper">
+            <!-- Main Login Card -->
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">🎓</div>
+                    <h1 class="login-title">CampusIQ</h1>
+                    <p class="login-subtitle">Campus Intelligence & Analytics Platform</p>
+                </div>
+
+                <div id="registeredMessage" class="success-message hidden">
+                    ✓ Account created successfully! Please sign in.
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                        <div class="forgot-password">
+                            <a href="/forgot-password.html">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Remember me for 30 days</label>
+                    </div>
+
+                    <div id="loginError" class="alert alert-danger hidden"></div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="loginBtn" style="margin-top: 1.5rem;">
+                        <span>Sign In</span>
+                        <span>→</span>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <div class="signup-link">
+                    Don't have an account? <a href="/signup.html">Create Account</a>
+                </div>
+            </div>
+
+            <!-- Demo Credentials Panel -->
+            <div class="demo-panel">
+                <h3>🔐 Demo Credentials</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                    Click any card below to auto-fill credentials
+                </p>
+                
+                <div class="demo-credentials">
+                    <div class="demo-cred-item admin" onclick="fillCredentials('admin@eduanalytics.edu', 'demo123')">
+                        <div class="role-badge">ADMIN</div>
+                        <div class="email">admin@eduanalytics.edu</div>
+                        <div class="desc">Full system access • Analytics • User management</div>
+                        <div class="click-hint">Click to login →</div>
+                    </div>
+                    
+                    <div class="demo-cred-item faculty" onclick="fillCredentials('sharma@eduanalytics.edu', 'demo123')">
+                        <div class="role-badge">FACULTY</div>
+                        <div class="email">sharma@eduanalytics.edu</div>
+                        <div class="desc">Dr. Rajesh Sharma • Machine Learning • 3 Classes</div>
+                        <div class="click-hint">Click to login →</div>
+                    </div>
+                    
+                    <div class="demo-cred-item student" onclick="fillCredentials('rahul.sharma@student.edu', 'demo123')">
+                        <div class="role-badge">STUDENT</div>
+                        <div class="email">rahul.sharma@student.edu</div>
+                        <div class="desc">Rahul Sharma • B.Tech CS • Semester 5 • Top Performer</div>
+                        <div class="click-hint">Click to login →</div>
+                    </div>
+                    
+                    <div class="demo-cred-item student" onclick="fillCredentials('amit.kumar@student.edu', 'demo123')">
+                        <div class="role-badge">STUDENT (At-Risk)</div>
+                        <div class="email">amit.kumar@student.edu</div>
+                        <div class="desc">Amit Kumar • B.Tech CS • Low Attendance Case</div>
+                        <div class="click-hint">Click to login →</div>
+                    </div>
+                </div>
+                
+                <div class="features-list">
+                    <h4>System Features</h4>
+                    <div class="feature-item"><span>📈</span> Real-time Performance Analytics</div>
+                    <div class="feature-item"><span>📋</span> Attendance Tracking System</div>
+                    <div class="feature-item"><span>⚠️</span> At-Risk Student Identification</div>
+                    <div class="feature-item"><span>💼</span> Placement Statistics</div>
+                    <div class="feature-item"><span>📄</span> XML Data Import/Export</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Fill credentials function with animation
+        function fillCredentials(email, password) {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Add visual feedback
+            emailInput.style.transform = 'scale(1.02)';
+            emailInput.style.borderColor = 'var(--primary)';
+            
+            setTimeout(() => {
+                emailInput.value = email;
+                emailInput.style.transform = 'scale(1)';
+            }, 150);
+            
+            setTimeout(() => {
+                passwordInput.style.transform = 'scale(1.02)';
+                passwordInput.style.borderColor = 'var(--primary)';
+                passwordInput.value = password;
+                
+                setTimeout(() => {
+                    passwordInput.style.transform = 'scale(1)';
+                }, 150);
+            }, 300);
+            
+            emailInput.focus();
+        }
+
+        // Check if just registered
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('registered') === 'true') {
+            document.getElementById('registeredMessage').classList.remove('hidden');
+        }
+
+        // Check for remembered email
+        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        if (rememberedEmail) {
+            document.getElementById('email').value = rememberedEmail;
+            document.getElementById('rememberMe').checked = true;
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span>';
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Handle remember me
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+
+                    // Success animation
+                    loginBtn.innerHTML = '<span>✓ Success!</span>';
+                    loginBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, #059669 100%)';
+
+                    // Redirect based on role
+                    const redirectMap = {
+                        'admin': '/admin/dashboard.html',
+                        'faculty': '/faculty/dashboard.html',
+                        'student': '/student/dashboard.html',
+                        'placement_officer': '/placement/dashboard.html'
+                    };
+
+                    setTimeout(() => {
+                        window.location.href = redirectMap[data.data.user.role] || '/admin/dashboard.html';
+                    }, 500);
+                } else {
+                    errorDiv.textContent = data.message || 'Invalid email or password';
+                    errorDiv.classList.remove('hidden');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<span>Sign In</span><span>→</span>';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Please check your network and try again.';
+                errorDiv.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Sign In</span><span>→</span>';
+            }
+        });
+
+        // Add floating animation to login card on mouse move
+        const loginCard = document.querySelector('.login-card');
+        loginCard.addEventListener('mousemove', (e) => {
+            const rect = loginCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 30;
+            const rotateY = (centerX - x) / 30;
+            
+            loginCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+        });
+
+        loginCard.addEventListener('mouseleave', () => {
+            loginCard.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+        });
+    </script>
+
+    <!-- Copyright Footer -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2026 <strong>CampusIQ</strong> - Campus Intelligence & Analytics Platform</p>
+            <p class="developer-info">Developed by <strong>Disha Sen</strong> | <a href="mailto:disha0204sen@gmail.com">disha0204sen@gmail.com</a></p>
+            <p class="tech-stack">Built with Node.js • Express • MySQL • Chart.js</p>
+        </div>
+    </footer>
+</body>
+</html>

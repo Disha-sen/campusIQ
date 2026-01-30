@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- Root Element -->
+    <xs:element name="StudentData">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Student" type="StudentType" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Student Type Definition -->
+    <xs:complexType name="StudentType">
+        <xs:sequence>
+            <xs:element name="StudentID" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Unique enrollment number (Required)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Full name of the student (Required)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Email" type="EmailType">
+                <xs:annotation>
+                    <xs:documentation>Valid email address (Required)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Phone" type="PhoneType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>10-digit phone number (Optional)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="DateOfBirth" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Date of birth in YYYY-MM-DD format (Optional)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Gender" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="male"/>
+                        <xs:enumeration value="female"/>
+                        <xs:enumeration value="other"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+            <xs:element name="Semester" type="SemesterType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Current semester (1-8)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Branch" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Branch/Course name (Optional)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="AdmissionYear" type="xs:gYear" minOccurs="0"/>
+            
+            <xs:element name="Batch" type="xs:string" minOccurs="0"/>
+            
+            <xs:element name="GuardianName" type="xs:string" minOccurs="0"/>
+            
+            <xs:element name="GuardianPhone" type="PhoneType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Custom Type Definitions -->
+    
+    <!-- Email Type with Pattern -->
+    <xs:simpleType name="EmailType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- Phone Type -->
+    <xs:simpleType name="PhoneType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{10}"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- Semester Type (1-8) -->
+    <xs:simpleType name="SemesterType">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="8"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+</xs:schema>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - CampusIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">🎓</span>
+                <span class="sidebar-title">CampusIQ</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link active" data-section="classes"><span class="nav-icon">📚</span><span class="nav-text">My Classes</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="analytics"><span class="nav-icon">📈</span><span class="nav-text">Class Analytics</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="attendance"><span class="nav-icon">📋</span><span class="nav-text">Mark Attendance</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="marks"><span class="nav-icon">📝</span><span class="nav-text">Enter Marks</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="atrisk"><span class="nav-icon">⚠️</span><span class="nav-text">At-Risk Students</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link logout-btn" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title" id="sectionTitle">My Classes</h1>
+                <div class="user-menu">
+                    <div>
+                        <div id="userName" style="font-weight:600;">Faculty</div>
+                        <div id="userRole" style="font-size:0.75rem;color:var(--text-muted);">FACULTY</div>
+                    </div>
+                    <div class="user-avatar" id="userAvatar">F</div>
+                    <button class="header-logout-btn" onclick="Auth.logout()" title="Logout">
+                        🚪 Logout
+                    </button>
+                </div>
+            </header>
+
+            <div id="content">
+                <!-- Classes Section -->
+                <section id="section-classes" class="dashboard-section">
+                    <div class="stats-grid" id="classesGrid"></div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="section-analytics" class="dashboard-section hidden">
+                    <div class="card mb-2">
+                        <label class="form-label">Select Subject</label>
+                        <select id="analyticsSubject" class="form-select" style="max-width:300px;"></select>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-container"><h3 class="chart-title">Marks Distribution</h3><div style="height:300px;"><canvas id="marksDistChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Attendance Trend</h3><div style="height:300px;"><canvas id="attTrendChart"></canvas></div></div>
+                    </div>
+                    <div class="card mt-3"><div class="card-header"><h3 class="card-title">At-Risk Students in This Class</h3></div><div id="classRiskTable"></div></div>
+                </section>
+
+                <!-- Attendance Section -->
+                <section id="section-attendance" class="dashboard-section hidden">
+                    <div class="card">
+                        <h3 class="card-title mb-2">Mark Attendance</h3>
+                        <div class="flex gap-2 mb-2" style="flex-wrap:wrap;">
+                            <select id="attSubject" class="form-select" style="width:200px;"></select>
+                            <input type="date" id="attDate" class="form-input" style="width:180px;">
+                            <button class="btn btn-primary" onclick="loadStudentsForAttendance()">Load Students</button>
+                        </div>
+                        <div id="attendanceForm"></div>
+                    </div>
+                </section>
+
+                <!-- Marks Section -->
+                <section id="section-marks" class="dashboard-section hidden">
+                    <div class="card">
+                        <h3 class="card-title mb-2">Enter Marks</h3>
+                        <div class="flex gap-2 mb-2" style="flex-wrap:wrap;">
+                            <select id="marksSubject" class="form-select" style="width:200px;"></select>
+                            <select id="examType" class="form-select" style="width:150px;">
+                                <option value="internal1">Internal 1</option>
+                                <option value="internal2">Internal 2</option>
+                                <option value="midterm">Midterm</option>
+                                <option value="final">Final</option>
+                            </select>
+                            <input type="number" id="maxMarks" class="form-input" placeholder="Max Marks" value="100" style="width:120px;">
+                            <button class="btn btn-primary" onclick="loadStudentsForMarks()">Load Students</button>
+                        </div>
+                        <div id="marksForm"></div>
+                    </div>
+                </section>
+
+                <!-- At-Risk Section -->
+                <section id="section-atrisk" class="dashboard-section hidden">
+                    <div class="card"><div class="card-header"><h3 class="card-title">At-Risk Students in My Classes</h3></div><div id="myAtRiskTable"></div></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/charts.js"></script>
+    <script>
+        let subjects = [];
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            loadClasses();
+            setupNavigation();
+            document.getElementById('attDate').valueAsDate = new Date();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.currentTarget.dataset.section;
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+                    document.getElementById(`section-${section}`).classList.remove('hidden');
+                    document.getElementById('sectionTitle').textContent = {
+                        classes: 'My Classes', analytics: 'Class Analytics', attendance: 'Mark Attendance', marks: 'Enter Marks', atrisk: 'At-Risk Students'
+                    }[section];
+                    if (section === 'atrisk') loadMyAtRisk();
+                });
+            });
+        }
+
+        async function loadClasses() {
+            const data = await api.get('/faculty/classes');
+            if (data?.success) {
+                subjects = data.data;
+                
+                if (subjects.length === 0) {
+                    document.getElementById('classesGrid').innerHTML = `
+                        <div class="card" style="grid-column: 1/-1; padding: 3rem; text-align: center;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+                            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">No Classes Assigned Yet</h3>
+                            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                                You don't have any subjects assigned to you yet.<br>
+                                Please contact your administrator to get subjects assigned.
+                            </p>
+                            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="requestDemoData()">
+                                    🎯 Load Demo Data
+                                </button>
+                                <button class="btn btn-outline" onclick="loadClasses()">
+                                    🔄 Refresh
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                document.getElementById('classesGrid').innerHTML = data.data.map(s => `
+                    <div class="stat-card" style="cursor: pointer;" onclick="viewClassDetails(${s.subject_id})">
+                        <div class="stat-icon primary">📖</div>
+                        <div class="stat-value">${s.subject_code}</div>
+                        <div class="stat-label">${s.subject_name}</div>
+                        <div style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);">
+                            ${s.course_name} | Sem ${s.semester_number} | ${s.student_count || 0} students
+                        </div>
+                    </div>
+                `).join('');
+                
+                populateSubjectDropdowns();
+            }
+        }
+        
+        async function requestDemoData() {
+            const result = await api.post('/faculty/setup-demo');
+            if (result?.success) {
+                alert('Demo data has been set up! Refreshing...');
+                loadClasses();
+            } else {
+                alert(result?.message || 'Failed to setup demo data');
+            }
+        }
+        
+        function viewClassDetails(subjectId) {
+            // Switch to analytics view for this subject
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector('[data-section="analytics"]').classList.add('active');
+            document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-analytics').classList.remove('hidden');
+            document.getElementById('sectionTitle').textContent = 'Class Analytics';
+            document.getElementById('analyticsSubject').value = subjectId;
+            loadClassAnalytics();
+        }
+
+        function populateSubjectDropdowns() {
+            if (subjects.length === 0) return;
+            
+            const options = subjects.map(s => `<option value="${s.subject_id}">${s.subject_code} - ${s.subject_name}</option>`).join('');
+            document.getElementById('analyticsSubject').innerHTML = options;
+            document.getElementById('attSubject').innerHTML = options;
+            document.getElementById('marksSubject').innerHTML = options;
+            
+            document.getElementById('analyticsSubject').addEventListener('change', loadClassAnalytics);
+            if (subjects.length > 0) loadClassAnalytics();
+        }
+
+        async function loadClassAnalytics() {
+            const subjectId = document.getElementById('analyticsSubject').value;
+            const data = await api.get(`/faculty/class-analytics/${subjectId}`);
+            if (!data?.success) return;
+
+            destroyChart(charts.marksDist);
+            const dist = data.data.marksDistribution || [];
+            charts.marksDist = Charts.createBar(
+                document.getElementById('marksDistChart'),
+                dist.map(d => d.grade), dist.map(d => d.count), 'Students'
+            );
+
+            destroyChart(charts.attTrend);
+            const trend = data.data.attendanceTrend || [];
+            charts.attTrend = Charts.createLine(
+                document.getElementById('attTrendChart'),
+                trend.map(t => t.date),
+                [{ label: 'Present', data: trend.map(t => t.present), color: '#10b981' }]
+            );
+
+            document.getElementById('classRiskTable').innerHTML = UI.createTable(data.data.atRiskStudents || [], [
+                { key: 'enrollment_number', label: 'Enrollment' },
+                { key: 'student_name', label: 'Name' },
+                { key: 'average_marks', label: 'Avg Marks', format: v => parseFloat(v || 0).toFixed(1) },
+                { key: 'attendance_percentage', label: 'Attendance', format: v => `${parseFloat(v || 0).toFixed(1)}%` }
+            ]);
+        }
+
+        async function loadStudentsForAttendance() {
+            const subjectId = document.getElementById('attSubject').value;
+            const data = await api.get(`/faculty/students/${subjectId}`);
+            if (!data?.success) return;
+
+            document.getElementById('attendanceForm').innerHTML = `
+                <table class="data-table">
+                    <thead><tr><th>Enrollment</th><th>Name</th><th>Status</th></tr></thead>
+                    <tbody>
+                        ${data.data.students.map(s => `
+                            <tr>
+                                <td>${s.enrollment_number}</td>
+                                <td>${s.first_name} ${s.last_name}</td>
+                                <td>
+                                    <select class="form-select att-status" data-student="${s.student_id}" style="width:120px;">
+                                        <option value="present">Present</option>
+                                        <option value="absent">Absent</option>
+                                        <option value="late">Late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <button class="btn btn-success mt-2" onclick="submitAttendance()">Submit Attendance</button>
+            `;
+        }
+
+        async function submitAttendance() {
+            const subjectId = document.getElementById('attSubject').value;
+            const date = document.getElementById('attDate').value;
+            const attendance = [...document.querySelectorAll('.att-status')].map(el => ({
+                studentId: el.dataset.student, status: el.value
+            }));
+            
+            const result = await api.post('/faculty/attendance', { subjectId, semesterId: 2, date, attendance });
+            alert(result?.success ? 'Attendance saved!' : 'Error saving attendance');
+        }
+
+        async function loadStudentsForMarks() {
+            const subjectId = document.getElementById('marksSubject').value;
+            const data = await api.get(`/faculty/students/${subjectId}`);
+            if (!data?.success) return;
+
+            document.getElementById('marksForm').innerHTML = `
+                <table class="data-table">
+                    <thead><tr><th>Enrollment</th><th>Name</th><th>Marks</th></tr></thead>
+                    <tbody>
+                        ${data.data.students.map(s => `
+                            <tr>
+                                <td>${s.enrollment_number}</td>
+                                <td>${s.first_name} ${s.last_name}</td>
+                                <td><input type="number" class="form-input marks-input" data-student="${s.student_id}" min="0" max="100" style="width:100px;"></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <button class="btn btn-success mt-2" onclick="submitMarks()">Submit Marks</button>
+            `;
+        }
+
+        async function submitMarks() {
+            const subjectId = document.getElementById('marksSubject').value;
+            const examType = document.getElementById('examType').value;
+            const maxMarks = document.getElementById('maxMarks').value;
+            const marks = [...document.querySelectorAll('.marks-input')].filter(el => el.value).map(el => ({
+                studentId: el.dataset.student, marksObtained: parseFloat(el.value)
+            }));
+            
+            const result = await api.post('/faculty/marks', { subjectId, semesterId: 2, examType, maxMarks, marks });
+            alert(result?.success ? 'Marks saved!' : 'Error saving marks');
+        }
+
+        async function loadMyAtRisk() {
+            const data = await api.get('/analytics/risk');
+            if (data?.success) {
+                document.getElementById('myAtRiskTable').innerHTML = UI.createTable(data.data.atRiskStudents || [], [
+                    { key: 'enrollment_number', label: 'Enrollment' },
+                    { key: 'student_name', label: 'Name' },
+                    { key: 'average_marks', label: 'Avg Marks', format: v => parseFloat(v || 0).toFixed(1) },
+                    { key: 'attendance_percentage', label: 'Attendance', format: v => `${parseFloat(v || 0).toFixed(1)}%` },
+                    { key: 'risk_level', label: 'Risk', format: v => `<span class="badge ${UI.getBadgeClass(v)}">${v}</span>` }
+                ]);
+            }
+        }
+    </script>
+
+    <!-- Copyright Footer -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2026 <strong>CampusIQ</strong> - Campus Intelligence & Analytics Platform</p>
+            <p class="developer-info">Developed by <strong>Disha Sen</strong> | <a href="mailto:disha0204sen@gmail.com">disha0204sen@gmail.com</a></p>
+            <p class="tech-stack">Built with Node.js • Express • MySQL • Chart.js</p>
+        </div>
+    </footer>
+</body>
+</html>

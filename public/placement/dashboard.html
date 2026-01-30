@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Dashboard - EduAnalytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">📊</span>
+                <span class="sidebar-title">EduAnalytics</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link active" data-section="overview"><span class="nav-icon">🏠</span><span class="nav-text">Overview</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="companies"><span class="nav-icon">🏢</span><span class="nav-text">Companies</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="students"><span class="nav-icon">👥</span><span class="nav-text">Students</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="analysis"><span class="nav-icon">📈</span><span class="nav-text">Analysis</span></a></li>
+            </ul>
+            <div class="sidebar-footer" style="border-top:1px solid var(--border-color);padding-top:1rem;margin-top:auto;">
+                <a href="#" class="nav-link" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title" id="sectionTitle">Placement Overview</h1>
+                <div class="user-menu">
+                    <div><div id="userName" style="font-weight:600;">Placement Officer</div><div id="userRole" style="font-size:0.75rem;color:var(--text-muted);">PLACEMENT OFFICER</div></div>
+                    <div class="user-avatar" id="userAvatar">P</div>
+                </div>
+            </header>
+
+            <div id="content">
+                <!-- Overview Section -->
+                <section id="section-overview" class="dashboard-section">
+                    <div class="stats-grid" id="overviewStats"></div>
+                    <div class="charts-grid">
+                        <div class="chart-container"><h3 class="chart-title">Package Distribution</h3><div style="height:300px;"><canvas id="packageChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Top Recruiters</h3><div style="height:300px;"><canvas id="topRecruitersChart"></canvas></div></div>
+                    </div>
+                </section>
+
+                <!-- Companies Section -->
+                <section id="section-companies" class="dashboard-section hidden">
+                    <div class="card"><div class="card-header"><h3 class="card-title">Recruiting Companies</h3></div><div id="companiesTable"></div></div>
+                </section>
+
+                <!-- Students Section -->
+                <section id="section-students" class="dashboard-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Placement Records</h3>
+                            <select id="statusFilter" class="form-select" style="width:150px;">
+                                <option value="">All Status</option>
+                                <option value="accepted">Accepted</option>
+                                <option value="offered">Offered</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div id="studentsTable"></div>
+                    </div>
+                </section>
+
+                <!-- Analysis Section -->
+                <section id="section-analysis" class="dashboard-section hidden">
+                    <div class="charts-grid">
+                        <div class="chart-container"><h3 class="chart-title">Year-over-Year Comparison</h3><div style="height:300px;"><canvas id="yoyChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Course-wise Placements</h3><div style="height:300px;"><canvas id="courseChart"></canvas></div></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/charts.js"></script>
+    <script>
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            loadOverview();
+            setupNavigation();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.currentTarget.dataset.section;
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+                    document.getElementById(`section-${section}`).classList.remove('hidden');
+                    document.getElementById('sectionTitle').textContent = { overview: 'Placement Overview', companies: 'Recruiting Companies', students: 'Placement Records', analysis: 'Placement Analysis' }[section];
+                    loadSection(section);
+                });
+            });
+        }
+
+        function loadSection(section) {
+            switch(section) {
+                case 'overview': loadOverview(); break;
+                case 'companies': loadCompanies(); break;
+                case 'students': loadStudents(); break;
+                case 'analysis': loadAnalysis(); break;
+            }
+        }
+
+        async function loadOverview() {
+            const stats = await api.get('/placement/stats');
+            const analytics = await api.get('/analytics/placement');
+            
+            if (stats?.success) {
+                const s = stats.data;
+                document.getElementById('overviewStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-value">${s.total_eligible || 0}</div><div class="stat-label">Eligible Students</div></div>
+                    <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-value">${s.placed || 0}</div><div class="stat-label">Placed</div></div>
+                    <div class="stat-card"><div class="stat-icon warning">💰</div><div class="stat-value">₹${s.average_package || 0} LPA</div><div class="stat-label">Avg Package</div></div>
+                    <div class="stat-card"><div class="stat-icon info">🏆</div><div class="stat-value">₹${s.highest_package || 0} LPA</div><div class="stat-label">Highest Package</div></div>
+                `;
+            }
+            
+            if (analytics?.success) {
+                destroyChart(charts.package);
+                const pkg = analytics.data.packageDistribution || [];
+                charts.package = Charts.createPie(
+                    document.getElementById('packageChart'),
+                    pkg.map(p => p.package_range),
+                    pkg.map(p => p.count)
+                );
+
+                destroyChart(charts.topRecruiters);
+                const comp = analytics.data.companyWise?.slice(0, 8) || [];
+                charts.topRecruiters = Charts.createHorizontalBar(
+                    document.getElementById('topRecruitersChart'),
+                    comp.map(c => c.company_name),
+                    comp.map(c => c.students_placed),
+                    'Students', '#10b981'
+                );
+            }
+        }
+
+        async function loadCompanies() {
+            const data = await api.get('/placement/companies');
+            if (data?.success) {
+                document.getElementById('companiesTable').innerHTML = UI.createTable(data.data || [], [
+                    { key: 'company_name', label: 'Company' },
+                    { key: 'total_offers', label: 'Offers' },
+                    { key: 'accepted', label: 'Accepted' },
+                    { key: 'avg_package', label: 'Avg Package', format: v => `₹${v} LPA` },
+                    { key: 'max_package', label: 'Max Package', format: v => `₹${v} LPA` }
+                ]);
+            }
+        }
+
+        async function loadStudents() {
+            const data = await api.get('/placement/students');
+            if (data?.success) {
+                document.getElementById('studentsTable').innerHTML = UI.createTable(data.data || [], [
+                    { key: 'enrollment_number', label: 'Enrollment' },
+                    { key: 'student_name', label: 'Name' },
+                    { key: 'course_name', label: 'Course' },
+                    { key: 'company_name', label: 'Company' },
+                    { key: 'job_role', label: 'Role' },
+                    { key: 'package_lpa', label: 'Package', format: v => v ? `₹${v} LPA` : '-' },
+                    { key: 'placement_status', label: 'Status', format: v => v ? `<span class="badge ${v === 'accepted' ? 'badge-success' : 'badge-warning'}">${v}</span>` : '-' }
+                ]);
+            }
+        }
+
+        async function loadAnalysis() {
+            const data = await api.get('/placement/package-analysis');
+            if (!data?.success) return;
+
+            destroyChart(charts.yoy);
+            const yoy = data.data.yoyComparison || [];
+            charts.yoy = Charts.createBar(
+                document.getElementById('yoyChart'),
+                yoy.map(y => y.batch),
+                yoy.map(y => y.avg_package),
+                'Avg Package (LPA)', '#6366f1'
+            );
+
+            destroyChart(charts.course);
+            const course = data.data.courseWise || [];
+            charts.course = Charts.createBar(
+                document.getElementById('courseChart'),
+                course.map(c => c.course_name?.substring(0, 15)),
+                course.map(c => c.placed),
+                'Students Placed', '#0ea5e9'
+            );
+        }
+    </script>
+</body>
+</html>

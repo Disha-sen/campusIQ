@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- Root Element -->
+    <xs:element name="StudentAnalyticsReport">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ReportMetadata" type="MetadataType" minOccurs="0"/>
+                <xs:element name="Student" type="StudentReportType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="generatedDate" type="xs:dateTime"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Report Metadata -->
+    <xs:complexType name="MetadataType">
+        <xs:sequence>
+            <xs:element name="GeneratedBy" type="xs:string" minOccurs="0"/>
+            <xs:element name="ReportType" type="xs:string" minOccurs="0"/>
+            <xs:element name="AcademicYear" type="xs:string" minOccurs="0"/>
+            <xs:element name="TotalStudents" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Student Analytics Record -->
+    <xs:complexType name="StudentReportType">
+        <xs:sequence>
+            <xs:element name="StudentID" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Enrollment number (Required)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Full name (Required)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Attendance" type="PercentageType">
+                <xs:annotation>
+                    <xs:documentation>Attendance percentage (0-100)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="AverageMarks" type="MarksType">
+                <xs:annotation>
+                    <xs:documentation>Average marks (0-100)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="RiskLevel" type="RiskLevelType">
+                <xs:annotation>
+                    <xs:documentation>Risk classification: High, Medium, or Low</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            
+            <xs:element name="Course" type="xs:string" minOccurs="0"/>
+            <xs:element name="Semester" type="xs:integer" minOccurs="0"/>
+            <xs:element name="Rank" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Custom Types -->
+    
+    <!-- Percentage Type (0-100) -->
+    <xs:simpleType name="PercentageType">
+        <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="100"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- Marks Type (0-100) -->
+    <xs:simpleType name="MarksType">
+        <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="100"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- Risk Level Enumeration -->
+    <xs:simpleType name="RiskLevelType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="High"/>
+            <xs:enumeration value="Medium"/>
+            <xs:enumeration value="Low"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+</xs:schema>

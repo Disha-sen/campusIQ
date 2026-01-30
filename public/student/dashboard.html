@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - CampusIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">🎓</span>
+                <span class="sidebar-title">CampusIQ</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link active" data-section="overview"><span class="nav-icon">🏠</span><span class="nav-text">Overview</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="performance"><span class="nav-icon">📈</span><span class="nav-text">Performance</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="attendance"><span class="nav-icon">📋</span><span class="nav-text">Attendance</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-section="placement"><span class="nav-icon">💼</span><span class="nav-text">Placement</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link logout-btn" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title" id="sectionTitle">My Dashboard</h1>
+                <div class="user-menu">
+                    <div>
+                        <div id="userName" style="font-weight:600;">Student</div>
+                        <div id="userRole" style="font-size:0.75rem;color:var(--text-muted);">STUDENT</div>
+                    </div>
+                    <div class="user-avatar" id="userAvatar">S</div>
+                    <button class="header-logout-btn" onclick="Auth.logout()" title="Logout">
+                        🚪 Logout
+                    </button>
+                </div>
+            </header>
+
+            <div id="content">
+                <!-- Overview Section -->
+                <section id="section-overview" class="dashboard-section">
+                    <div class="stats-grid" id="overviewStats"></div>
+                    <div class="charts-grid">
+                        <div class="chart-container"><h3 class="chart-title">Semester-wise Performance</h3><div style="height:300px;"><canvas id="semTrendChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Attendance by Subject</h3><div style="height:300px;"><canvas id="attPieChart"></canvas></div></div>
+                    </div>
+                </section>
+
+                <!-- Performance Section -->
+                <section id="section-performance" class="dashboard-section hidden">
+                    <div class="stats-grid" id="perfStats"></div>
+                    <div class="chart-container mb-3"><h3 class="chart-title">Subject-wise Marks</h3><div style="height:350px;"><canvas id="subjectMarksChart"></canvas></div></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title">All Results</h3></div><div id="resultsTable"></div></div>
+                </section>
+
+                <!-- Attendance Section -->
+                <section id="section-attendance" class="dashboard-section hidden">
+                    <div class="stats-grid" id="attStats"></div>
+                    <div class="charts-grid">
+                        <div class="chart-container"><h3 class="chart-title">Monthly Attendance Trend</h3><div style="height:300px;"><canvas id="monthlyAttChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Subject-wise Breakdown</h3><div style="height:300px;"><canvas id="subjectAttChart"></canvas></div></div>
+                    </div>
+                </section>
+
+                <!-- Placement Section -->
+                <section id="section-placement" class="dashboard-section hidden">
+                    <div class="card"><div class="card-header"><h3 class="card-title">My Placement Status</h3></div><div id="placementInfo"></div></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/charts.js"></script>
+    <script>
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            loadOverview();
+            setupNavigation();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.currentTarget.dataset.section;
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+                    document.getElementById(`section-${section}`).classList.remove('hidden');
+                    document.getElementById('sectionTitle').textContent = { overview: 'My Dashboard', performance: 'My Performance', attendance: 'My Attendance', placement: 'Placement Status' }[section];
+                    loadSection(section);
+                });
+            });
+        }
+
+        function loadSection(section) {
+            switch(section) {
+                case 'overview': loadOverview(); break;
+                case 'performance': loadPerformance(); break;
+                case 'attendance': loadAttendance(); break;
+                case 'placement': loadPlacement(); break;
+            }
+        }
+
+        async function loadOverview() {
+            const perfData = await api.get('/student/performance');
+            const attData = await api.get('/student/attendance');
+            
+            // Check if student has any data
+            const hasPerformance = perfData?.success && perfData.data.overall?.subjects_count > 0;
+            const hasAttendance = attData?.success && attData.data.overall?.total_classes > 0;
+            
+            if (!hasPerformance && !hasAttendance) {
+                document.getElementById('overviewStats').innerHTML = '';
+                document.getElementById('content').querySelector('#section-overview').innerHTML = `
+                    <div class="card" style="padding: 3rem; text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🎓</div>
+                        <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Welcome to Your Dashboard!</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Your academic data is being set up.<br>
+                            Once your teachers start entering attendance and marks, you'll see your progress here.
+                        </p>
+                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="requestStudentDemoData()">
+                                🎯 Load Demo Data
+                            </button>
+                            <button class="btn btn-outline" onclick="loadOverview()">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="charts-grid" style="margin-top: 1rem;">
+                        <div class="chart-container"><h3 class="chart-title">Semester-wise Performance</h3><div style="height:300px;"><canvas id="semTrendChart"></canvas></div></div>
+                        <div class="chart-container"><h3 class="chart-title">Attendance by Subject</h3><div style="height:300px;"><canvas id="attPieChart"></canvas></div></div>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (perfData?.success && attData?.success) {
+                const perf = perfData.data.overall || {};
+                const att = attData.data.overall || {};
+                
+                document.getElementById('overviewStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-icon primary">📊</div><div class="stat-value">${parseFloat(perf.overall_average || 0).toFixed(1)}</div><div class="stat-label">Overall Average</div></div>
+                    <div class="stat-card"><div class="stat-icon success">📋</div><div class="stat-value">${att.percentage || 0}%</div><div class="stat-label">Overall Attendance</div></div>
+                    <div class="stat-card"><div class="stat-icon info">📚</div><div class="stat-value">${perf.subjects_count || 0}</div><div class="stat-label">Subjects</div></div>
+                    <div class="stat-card"><div class="stat-icon warning">🏆</div><div class="stat-value">#${perfData.data.rank || '-'}</div><div class="stat-label">Class Rank</div></div>
+                `;
+
+                destroyChart(charts.semTrend);
+                const trend = perfData.data.semesterTrend || [];
+                if (trend.length > 0) {
+                    charts.semTrend = Charts.createLine(
+                        document.getElementById('semTrendChart'),
+                        trend.map(t => `Sem ${t.semester_number}`),
+                        [{ label: 'Average', data: trend.map(t => t.average_marks), color: '#6366f1' }]
+                    );
+                }
+
+                destroyChart(charts.attPie);
+                const subjAtt = attData.data.subjectWise || [];
+                if (subjAtt.length > 0) {
+                    charts.attPie = Charts.createPie(
+                        document.getElementById('attPieChart'),
+                        subjAtt.map(s => s.subject_name),
+                        subjAtt.map(s => s.attended)
+                    );
+                }
+            }
+        }
+        
+        async function requestStudentDemoData() {
+            const result = await api.post('/student/setup-demo');
+            if (result?.success) {
+                alert('Demo data has been set up! Refreshing...');
+                location.reload();
+            } else {
+                alert(result?.message || 'Failed to setup demo data');
+            }
+        }
+
+        async function loadPerformance() {
+            const data = await api.get('/student/performance');
+            if (!data?.success) return;
+
+            const perf = data.data.overall || {};
+            document.getElementById('perfStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon primary">📊</div><div class="stat-value">${parseFloat(perf.overall_average || 0).toFixed(1)}</div><div class="stat-label">Average</div></div>
+                <div class="stat-card"><div class="stat-icon success">⬆️</div><div class="stat-value">${perf.highest_marks || 0}</div><div class="stat-label">Highest</div></div>
+                <div class="stat-card"><div class="stat-icon danger">⬇️</div><div class="stat-value">${perf.lowest_marks || 0}</div><div class="stat-label">Lowest</div></div>
+            `;
+
+            destroyChart(charts.subjectMarks);
+            const subjects = data.data.subjectWise?.filter(s => s.exam_type === 'final') || [];
+            charts.subjectMarks = Charts.createBar(
+                document.getElementById('subjectMarksChart'),
+                subjects.map(s => s.subject_code),
+                subjects.map(s => s.marks_obtained),
+                'Marks Obtained'
+            );
+
+            document.getElementById('resultsTable').innerHTML = UI.createTable(data.data.subjectWise || [], [
+                { key: 'subject_code', label: 'Code' },
+                { key: 'subject_name', label: 'Subject' },
+                { key: 'exam_type', label: 'Exam' },
+                { key: 'marks_obtained', label: 'Marks' },
+                { key: 'max_marks', label: 'Max' },
+                { key: 'percentage', label: '%', format: v => `${v}%` }
+            ]);
+        }
+
+        async function loadAttendance() {
+            const data = await api.get('/student/attendance');
+            if (!data?.success) return;
+
+            const att = data.data.overall || {};
+            const attClass = att.percentage >= 75 ? 'success' : att.percentage >= 60 ? 'warning' : 'danger';
+            
+            document.getElementById('attStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon ${attClass}">📋</div><div class="stat-value">${att.percentage || 0}%</div><div class="stat-label">Overall</div></div>
+                <div class="stat-card"><div class="stat-icon primary">📅</div><div class="stat-value">${att.total_classes || 0}</div><div class="stat-label">Total Classes</div></div>
+                <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-value">${att.attended || 0}</div><div class="stat-label">Attended</div></div>
+            `;
+
+            destroyChart(charts.monthlyAtt);
+            const monthly = data.data.monthlyTrend || [];
+            charts.monthlyAtt = Charts.createLine(
+                document.getElementById('monthlyAttChart'),
+                monthly.map(m => m.month),
+                [{ label: 'Attendance %', data: monthly.map(m => m.percentage), color: '#10b981' }]
+            );
+
+            destroyChart(charts.subjectAtt);
+            const subjAtt = data.data.subjectWise || [];
+            charts.subjectAtt = Charts.createHorizontalBar(
+                document.getElementById('subjectAttChart'),
+                subjAtt.map(s => s.subject_name),
+                subjAtt.map(s => s.percentage),
+                'Attendance %', '#0ea5e9'
+            );
+        }
+
+        async function loadPlacement() {
+            const data = await api.get('/student/placement');
+            if (!data?.success) return;
+
+            const placements = data.data.placements || [];
+            if (placements.length === 0) {
+                document.getElementById('placementInfo').innerHTML = `
+                    <p style="color:var(--text-muted);padding:2rem;text-align:center;">
+                        ${data.data.currentSemester < 7 ? '⏳ Placements start from 7th semester.' : '📋 No placement records yet.'}
+                    </p>
+                `;
+            } else {
+                document.getElementById('placementInfo').innerHTML = UI.createTable(placements, [
+                    { key: 'company_name', label: 'Company' },
+                    { key: 'job_role', label: 'Role' },
+                    { key: 'package_lpa', label: 'Package', format: v => `₹${v} LPA` },
+                    { key: 'placement_status', label: 'Status', format: v => `<span class="badge ${v === 'accepted' ? 'badge-success' : 'badge-warning'}">${v}</span>` },
+                    { key: 'location', label: 'Location' }
+                ]);
+            }
+        }
+    </script>
+
+    <!-- Copyright Footer -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2026 <strong>CampusIQ</strong> - Campus Intelligence & Analytics Platform</p>
+            <p class="developer-info">Developed by <strong>Disha Sen</strong> | <a href="mailto:disha0204sen@gmail.com">disha0204sen@gmail.com</a></p>
+            <p class="tech-stack">Built with Node.js • Express • MySQL • Chart.js</p>
+        </div>
+    </footer>
+</body>
+</html>

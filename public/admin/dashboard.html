@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CampusIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">🎓</span>
+                <span class="sidebar-title">CampusIQ</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="academic">
+                        <span class="nav-icon">📚</span>
+                        <span class="nav-text">Academic Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="attendance">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">Attendance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="risk">
+                        <span class="nav-icon">⚠️</span>
+                        <span class="nav-text">At-Risk Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="placement">
+                        <span class="nav-icon">💼</span>
+                        <span class="nav-text">Placements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="students">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="faculty">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span class="nav-text">Faculty & Subjects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="xml">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-text">XML Import/Export</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link logout-btn" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title" id="sectionTitle">Dashboard Overview</h1>
+                <div class="user-menu">
+                    <div>
+                        <div id="userName" style="font-weight:600;">Admin</div>
+                        <div id="userRole" style="font-size:0.75rem;color:var(--text-muted);">ADMINISTRATOR</div>
+                    </div>
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <button class="header-logout-btn" onclick="Auth.logout()" title="Logout">
+                        🚪 Logout
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Sections -->
+            <div id="content">
+                <!-- Overview Section -->
+                <section id="section-overview" class="dashboard-section">
+                    <div class="stats-grid" id="statsGrid"></div>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Performance Trend by Semester</h3>
+                            <div style="height:300px;"><canvas id="trendChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">Risk Level Distribution</h3>
+                            <div style="height:300px;"><canvas id="riskPieChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Academic Section -->
+                <section id="section-academic" class="dashboard-section hidden">
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Average Marks by Subject</h3>
+                            <div style="height:350px;"><canvas id="subjectMarksChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">Pass/Fail Distribution</h3>
+                            <div style="height:350px;"><canvas id="passFailChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header"><h3 class="card-title">Top Performers</h3></div>
+                        <div id="topPerformersTable"></div>
+                    </div>
+                </section>
+
+                <!-- Attendance Section -->
+                <section id="section-attendance" class="dashboard-section hidden">
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Attendance vs Performance Correlation</h3>
+                            <div style="height:350px;"><canvas id="correlationChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">Subject-wise Attendance</h3>
+                            <div style="height:350px;"><canvas id="subjectAttChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header"><h3 class="card-title">Low Attendance Alerts (&lt;75%)</h3></div>
+                        <div id="lowAttendanceTable"></div>
+                    </div>
+                </section>
+
+                <!-- Risk Section -->
+                <section id="section-risk" class="dashboard-section hidden">
+                    <div class="stats-grid" id="riskStats"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">At-Risk Students</h3>
+                            <select id="riskFilter" class="form-select" style="width:auto;">
+                                <option value="">All Risk Levels</option>
+                                <option value="High">High Risk</option>
+                                <option value="Medium">Medium Risk</option>
+                            </select>
+                        </div>
+                        <div id="riskStudentsTable"></div>
+                    </div>
+                </section>
+
+                <!-- Placement Section -->
+                <section id="section-placement" class="dashboard-section hidden">
+                    <div class="stats-grid" id="placementStats"></div>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Package Distribution</h3>
+                            <div style="height:300px;"><canvas id="packageChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">Top Recruiting Companies</h3>
+                            <div style="height:300px;"><canvas id="companyChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Students Section -->
+                <section id="section-students" class="dashboard-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">All Students</h3>
+                            <input type="text" id="studentSearch" class="form-input" placeholder="Search..." style="width:250px;">
+                        </div>
+                        <div id="studentsTable"></div>
+                    </div>
+                </section>
+
+                <!-- Faculty Management Section -->
+                <section id="section-faculty" class="dashboard-section hidden">
+                    <div class="stats-grid" id="facultyStats"></div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">Faculty Members</h3>
+                        </div>
+                        <div id="facultyTable"></div>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">Subject-Faculty Assignment</h3>
+                        </div>
+                        <div class="flex gap-2 mb-2" style="flex-wrap: wrap; align-items: flex-end;">
+                            <div>
+                                <label class="form-label">Select Subject</label>
+                                <select id="subjectSelect" class="form-select" style="width: 300px;"></select>
+                            </div>
+                            <div>
+                                <label class="form-label">Assign to Faculty</label>
+                                <select id="facultySelect" class="form-select" style="width: 250px;"></select>
+                            </div>
+                            <button class="btn btn-primary" onclick="assignSubject()">Assign</button>
+                        </div>
+                        <div id="subjectsTable"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Create New Subject</h3>
+                        </div>
+                        <div class="flex gap-2" style="flex-wrap: wrap; align-items: flex-end;">
+                            <div>
+                                <label class="form-label">Subject Code</label>
+                                <input type="text" id="newSubjectCode" class="form-input" placeholder="e.g., CS101" style="width: 120px;">
+                            </div>
+                            <div>
+                                <label class="form-label">Subject Name</label>
+                                <input type="text" id="newSubjectName" class="form-input" placeholder="e.g., Introduction to Programming" style="width: 250px;">
+                            </div>
+                            <div>
+                                <label class="form-label">Credits</label>
+                                <input type="number" id="newSubjectCredits" class="form-input" value="4" min="1" max="6" style="width: 80px;">
+                            </div>
+                            <div>
+                                <label class="form-label">Course</label>
+                                <select id="newSubjectCourse" class="form-select" style="width: 150px;"></select>
+                            </div>
+                            <div>
+                                <label class="form-label">Semester</label>
+                                <select id="newSubjectSemester" class="form-select" style="width: 100px;">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success" onclick="createSubject()">Create Subject</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- XML Section -->
+                <section id="section-xml" class="dashboard-section hidden">
+                    <div class="card">
+                        <h3 class="card-title mb-2">Import Students from XML</h3>
+                        <div class="file-upload" id="xmlUploadArea">
+                            <div class="file-upload-icon">📁</div>
+                            <p>Drag & drop XML file here or click to browse</p>
+                            <input type="file" id="xmlFileInput" accept=".xml" style="display:none;">
+                        </div>
+                        <div id="importResult" class="mt-2"></div>
+                    </div>
+                    <div class="card mt-3">
+                        <h3 class="card-title mb-2">Export Data as XML</h3>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary" onclick="exportStudentsXML()">Export Students</button>
+                            <button class="btn btn-secondary" onclick="exportAnalyticsXML()">Export Analytics Report</button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <h3 class="card-title mb-2">Sample XML Format</h3>
+                        <pre style="background:var(--bg-dark);padding:1rem;border-radius:8px;overflow-x:auto;font-size:0.85rem;"><code>&lt;StudentData&gt;
+  &lt;Student&gt;
+    &lt;StudentID&gt;EN2024001&lt;/StudentID&gt;
+    &lt;Name&gt;John Doe&lt;/Name&gt;
+    &lt;Email&gt;john@example.com&lt;/Email&gt;
+    &lt;Phone&gt;9876543210&lt;/Phone&gt;
+    &lt;Semester&gt;5&lt;/Semester&gt;
+  &lt;/Student&gt;
+&lt;/StudentData&gt;</code></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/charts.js"></script>
+    <script>
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            loadOverview();
+            setupNavigation();
+            setupXMLUpload();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.currentTarget.dataset.section;
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    
+                    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+                    document.getElementById(`section-${section}`).classList.remove('hidden');
+                    
+                    const titles = {
+                        overview: 'Dashboard Overview',
+                        academic: 'Academic Analytics',
+                        attendance: 'Attendance Analytics',
+                        risk: 'At-Risk Students',
+                        placement: 'Placement Analytics',
+                        students: 'Student Management',
+                        faculty: 'Faculty & Subject Management',
+                        xml: 'XML Import/Export'
+                    };
+                    document.getElementById('sectionTitle').textContent = titles[section];
+                    
+                    loadSection(section);
+                });
+            });
+        }
+
+        function loadSection(section) {
+            switch(section) {
+                case 'overview': loadOverview(); break;
+                case 'academic': loadAcademic(); break;
+                case 'attendance': loadAttendance(); break;
+                case 'risk': loadRisk(); break;
+                case 'placement': loadPlacement(); break;
+                case 'students': loadStudents(); break;
+                case 'faculty': loadFaculty(); break;
+            }
+        }
+
+        async function loadOverview() {
+            const data = await api.get('/analytics/dashboard');
+            if (data?.success) {
+                const d = data.data;
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-value">${d.totalStudents || 0}</div><div class="stat-label">Total Students</div></div>
+                    <div class="stat-card"><div class="stat-icon success">👨‍🏫</div><div class="stat-value">${d.totalFaculty || 0}</div><div class="stat-label">Faculty Members</div></div>
+                    <div class="stat-card"><div class="stat-icon info">📚</div><div class="stat-value">${d.totalCourses || 0}</div><div class="stat-label">Courses</div></div>
+                    <div class="stat-card"><div class="stat-icon warning">💼</div><div class="stat-value">${d.placedStudents || 0}</div><div class="stat-label">Placed Students</div></div>
+                    <div class="stat-card"><div class="stat-icon danger">⚠️</div><div class="stat-value">${d.atRiskStudents || 0}</div><div class="stat-label">At-Risk Students</div></div>
+                `;
+            }
+            
+            const academic = await api.get('/analytics/academic');
+            if (academic?.success) {
+                destroyChart(charts.trend);
+                const trend = academic.data.semesterTrend || [];
+                charts.trend = Charts.createLine(
+                    document.getElementById('trendChart'),
+                    trend.map(t => t.semester_name),
+                    [{ label: 'Average Marks', data: trend.map(t => t.average_marks), color: '#6366f1' }]
+                );
+            }
+            
+            const risk = await api.get('/analytics/risk');
+            if (risk?.success) {
+                destroyChart(charts.riskPie);
+                const summary = risk.data.riskSummary || [];
+                charts.riskPie = Charts.createPie(
+                    document.getElementById('riskPieChart'),
+                    summary.map(s => s.risk_level),
+                    summary.map(s => s.count)
+                );
+            }
+        }
+
+        async function loadAcademic() {
+            const data = await api.get('/analytics/academic');
+            if (!data?.success) return;
+            
+            destroyChart(charts.subjectMarks);
+            const subjects = data.data.subjectMarks?.slice(0, 10) || [];
+            charts.subjectMarks = Charts.createBar(
+                document.getElementById('subjectMarksChart'),
+                subjects.map(s => s.subject_code),
+                subjects.map(s => s.average_marks),
+                'Average Marks'
+            );
+            
+            destroyChart(charts.passFail);
+            const pf = data.data.passFailStats || [];
+            charts.passFail = new Chart(document.getElementById('passFailChart'), {
+                type: 'bar',
+                data: {
+                    labels: pf.slice(0, 8).map(s => s.subject_name?.substring(0, 15)),
+                    datasets: [
+                        { label: 'Passed', data: pf.slice(0, 8).map(s => s.passed), backgroundColor: '#10b981' },
+                        { label: 'Failed', data: pf.slice(0, 8).map(s => s.failed), backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: { ...chartDefaults, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+            
+            const topPerformers = data.data.topPerformers || [];
+            document.getElementById('topPerformersTable').innerHTML = UI.createTable(topPerformers, [
+                { key: 'enrollment_number', label: 'Enrollment' },
+                { key: 'student_name', label: 'Name' },
+                { key: 'course_name', label: 'Course' },
+                { key: 'current_semester', label: 'Semester' },
+                { key: 'average_marks', label: 'Avg Marks', format: v => `<strong>${parseFloat(v).toFixed(1)}</strong>` }
+            ]);
+        }
+
+        async function loadAttendance() {
+            const data = await api.get('/analytics/attendance');
+            if (!data?.success) return;
+            
+            destroyChart(charts.correlation);
+            const corr = data.data.correlation || [];
+            charts.correlation = Charts.createScatter(
+                document.getElementById('correlationChart'),
+                corr.map(c => ({ x: c.attendance_percentage, y: c.average_marks })),
+                'Attendance %', 'Average Marks'
+            );
+            
+            destroyChart(charts.subjectAtt);
+            const subj = data.data.subjectAttendance || [];
+            charts.subjectAtt = Charts.createHorizontalBar(
+                document.getElementById('subjectAttChart'),
+                subj.map(s => s.subject_name),
+                subj.map(s => s.avg_attendance),
+                'Avg Attendance %', '#0ea5e9'
+            );
+            
+            document.getElementById('lowAttendanceTable').innerHTML = UI.createTable(data.data.lowAttendance || [], [
+                { key: 'student_name', label: 'Student' },
+                { key: 'subject_name', label: 'Subject' },
+                { key: 'percentage', label: 'Attendance', format: v => `<span class="badge ${v < 60 ? 'badge-danger' : 'badge-warning'}">${v}%</span>` }
+            ]);
+        }
+
+        async function loadRisk() {
+            const data = await api.get('/analytics/risk');
+            if (!data?.success) return;
+            
+            const summary = data.data.riskSummary || [];
+            const high = summary.find(s => s.risk_level === 'High')?.count || 0;
+            const medium = summary.find(s => s.risk_level === 'Medium')?.count || 0;
+            
+            document.getElementById('riskStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon danger">🔴</div><div class="stat-value">${high}</div><div class="stat-label">High Risk</div></div>
+                <div class="stat-card"><div class="stat-icon warning">🟡</div><div class="stat-value">${medium}</div><div class="stat-label">Medium Risk</div></div>
+            `;
+            
+            renderRiskTable(data.data.atRiskStudents);
+        }
+
+        function renderRiskTable(students) {
+            document.getElementById('riskStudentsTable').innerHTML = UI.createTable(students || [], [
+                { key: 'enrollment_number', label: 'Enrollment' },
+                { key: 'student_name', label: 'Name' },
+                { key: 'course_name', label: 'Course' },
+                { key: 'average_marks', label: 'Avg Marks', format: v => parseFloat(v).toFixed(1) },
+                { key: 'attendance_percentage', label: 'Attendance', format: v => `${parseFloat(v).toFixed(1)}%` },
+                { key: 'risk_level', label: 'Risk', format: v => `<span class="badge ${UI.getBadgeClass(v)}">${v}</span>` },
+                { key: 'guardian_phone', label: 'Guardian Contact' }
+            ]);
+        }
+
+        async function loadPlacement() {
+            const data = await api.get('/analytics/placement');
+            if (!data?.success) return;
+            
+            const s = data.data.overallStats || {};
+            document.getElementById('placementStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-value">${s.total_students || 0}</div><div class="stat-label">Eligible Students</div></div>
+                <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-value">${s.placed_students || 0}</div><div class="stat-label">Placed</div></div>
+                <div class="stat-card"><div class="stat-icon warning">💰</div><div class="stat-value">₹${s.average_package || 0} LPA</div><div class="stat-label">Avg Package</div></div>
+                <div class="stat-card"><div class="stat-icon info">🏆</div><div class="stat-value">₹${s.highest_package || 0} LPA</div><div class="stat-label">Highest Package</div></div>
+            `;
+            
+            destroyChart(charts.package);
+            const pkg = data.data.packageDistribution || [];
+            charts.package = Charts.createPie(
+                document.getElementById('packageChart'),
+                pkg.map(p => p.package_range),
+                pkg.map(p => p.count)
+            );
+            
+            destroyChart(charts.company);
+            const comp = data.data.companyWise?.slice(0, 8) || [];
+            charts.company = Charts.createHorizontalBar(
+                document.getElementById('companyChart'),
+                comp.map(c => c.company_name),
+                comp.map(c => c.students_placed),
+                'Students Placed', '#10b981'
+            );
+        }
+
+        async function loadStudents() {
+            const data = await api.get('/admin/students');
+            if (data?.success) {
+                document.getElementById('studentsTable').innerHTML = UI.createTable(data.data, [
+                    { key: 'enrollment_number', label: 'Enrollment' },
+                    { key: 'first_name', label: 'First Name' },
+                    { key: 'last_name', label: 'Last Name' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'course_name', label: 'Course' },
+                    { key: 'current_semester', label: 'Semester' }
+                ]);
+            }
+        }
+
+        function setupXMLUpload() {
+            const area = document.getElementById('xmlUploadArea');
+            const input = document.getElementById('xmlFileInput');
+            
+            area.addEventListener('click', () => input.click());
+            area.addEventListener('dragover', (e) => { e.preventDefault(); area.style.borderColor = 'var(--primary)'; });
+            area.addEventListener('dragleave', () => area.style.borderColor = 'var(--border-color)');
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.style.borderColor = 'var(--border-color)';
+                if (e.dataTransfer.files[0]) uploadXML(e.dataTransfer.files[0]);
+            });
+            input.addEventListener('change', () => { if (input.files[0]) uploadXML(input.files[0]); });
+        }
+
+        async function uploadXML(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            document.getElementById('importResult').innerHTML = '<div class="alert alert-info">Uploading...</div>';
+            
+            try {
+                const response = await fetch('/api/xml/import/students', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` },
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('importResult').innerHTML = `<div class="alert alert-success">✅ ${data.message}</div>`;
+                } else {
+                    document.getElementById('importResult').innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
+                }
+            } catch (err) {
+                document.getElementById('importResult').innerHTML = '<div class="alert alert-danger">Upload failed</div>';
+            }
+        }
+
+        function exportStudentsXML() {
+            window.open('/api/xml/export/students', '_blank');
+        }
+        
+        function exportAnalyticsXML() {
+            window.open('/api/xml/export/analytics-report', '_blank');
+        }
+        
+        // Faculty Management Functions
+        let allFaculty = [];
+        let allSubjects = [];
+        let allCourses = [];
+        
+        async function loadFaculty() {
+            // Load faculty list
+            const facultyData = await api.get('/admin/faculty');
+            const subjectsData = await api.get('/admin/subjects');
+            const coursesData = await api.get('/auth/courses');
+            
+            if (facultyData?.success) {
+                allFaculty = facultyData.data;
+                
+                // Stats
+                document.getElementById('facultyStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-icon primary">👨‍🏫</div><div class="stat-value">${allFaculty.length}</div><div class="stat-label">Total Faculty</div></div>
+                    <div class="stat-card"><div class="stat-icon success">📚</div><div class="stat-value">${allSubjects.length}</div><div class="stat-label">Total Subjects</div></div>
+                `;
+                
+                // Faculty table
+                document.getElementById('facultyTable').innerHTML = UI.createTable(allFaculty, [
+                    { key: 'employee_id', label: 'Employee ID' },
+                    { key: 'first_name', label: 'First Name' },
+                    { key: 'last_name', label: 'Last Name' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'department_name', label: 'Department' },
+                    { key: 'subjects_count', label: 'Subjects', format: v => `<span class="badge badge-info">${v}</span>` }
+                ]);
+                
+                // Populate faculty dropdown
+                document.getElementById('facultySelect').innerHTML = 
+                    '<option value="">-- Select Faculty --</option>' +
+                    allFaculty.map(f => `<option value="${f.faculty_id}">${f.first_name} ${f.last_name} (${f.employee_id || 'No ID'})</option>`).join('');
+            }
+            
+            if (subjectsData?.success) {
+                allSubjects = subjectsData.data;
+                
+                // Subjects table
+                document.getElementById('subjectsTable').innerHTML = UI.createTable(allSubjects, [
+                    { key: 'subject_code', label: 'Code' },
+                    { key: 'subject_name', label: 'Subject Name' },
+                    { key: 'course_name', label: 'Course' },
+                    { key: 'semester_number', label: 'Semester' },
+                    { key: 'credits', label: 'Credits' },
+                    { key: 'faculty_name', label: 'Assigned To', format: v => v || '<span style="color:var(--danger);">Unassigned</span>' }
+                ]);
+                
+                // Populate subject dropdown
+                document.getElementById('subjectSelect').innerHTML = 
+                    '<option value="">-- Select Subject --</option>' +
+                    allSubjects.map(s => `<option value="${s.subject_id}">${s.subject_code} - ${s.subject_name} (${s.faculty_name || 'Unassigned'})</option>`).join('');
+            }
+            
+            if (coursesData?.success) {
+                allCourses = coursesData.data;
+                document.getElementById('newSubjectCourse').innerHTML = 
+                    allCourses.map(c => `<option value="${c.course_id}">${c.course_name}</option>`).join('');
+            }
+        }
+        
+        async function assignSubject() {
+            const subjectId = document.getElementById('subjectSelect').value;
+            const facultyId = document.getElementById('facultySelect').value;
+            
+            if (!subjectId || !facultyId) {
+                alert('Please select both a subject and a faculty member');
+                return;
+            }
+            
+            const result = await api.post('/admin/assign-subject', { subjectId, facultyId });
+            if (result?.success) {
+                alert('Subject assigned successfully!');
+                loadFaculty();
+            } else {
+                alert(result?.message || 'Failed to assign subject');
+            }
+        }
+        
+        async function createSubject() {
+            const subjectCode = document.getElementById('newSubjectCode').value.trim();
+            const subjectName = document.getElementById('newSubjectName').value.trim();
+            const credits = document.getElementById('newSubjectCredits').value;
+            const courseId = document.getElementById('newSubjectCourse').value;
+            const semesterNumber = document.getElementById('newSubjectSemester').value;
+            
+            if (!subjectCode || !subjectName) {
+                alert('Please fill in subject code and name');
+                return;
+            }
+            
+            const result = await api.post('/admin/subjects', {
+                subjectCode, subjectName, credits, courseId, semesterNumber
+            });
+            
+            if (result?.success) {
+                alert('Subject created successfully!');
+                document.getElementById('newSubjectCode').value = '';
+                document.getElementById('newSubjectName').value = '';
+                loadFaculty();
+            } else {
+                alert(result?.message || 'Failed to create subject');
+            }
+        }
+    </script>
+
+    <!-- Copyright Footer -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2026 <strong>CampusIQ</strong> - Campus Intelligence & Analytics Platform</p>
+            <p class="developer-info">Developed by <strong>Disha Sen</strong> | <a href="mailto:disha0204sen@gmail.com">disha0204sen@gmail.com</a></p>
+            <p class="tech-stack">Built with Node.js • Express • MySQL • Chart.js</p>
+        </div>
+    </footer>
+</body>
+</html>
