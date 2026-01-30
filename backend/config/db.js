@@ -1,15 +1,39 @@
 // =====================================================
 // Database Configuration - MySQL Connection Pool
+// CampusIQ - Supports Railway, PlanetScale, Local MySQL
 // =====================================================
 
 const mysql = require('mysql2/promise');
 
+// Parse DATABASE_URL if provided (Railway format)
+let dbConfig;
+
+if (process.env.DATABASE_URL || process.env.MYSQL_URL) {
+    const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL;
+    const url = new URL(dbUrl);
+    dbConfig = {
+        host: url.hostname,
+        port: url.port || 3306,
+        user: url.username,
+        password: url.password,
+        database: url.pathname.slice(1), // Remove leading /
+        ssl: {
+            rejectUnauthorized: false
+        }
+    };
+} else {
+    dbConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'educational_analytics'
+    };
+}
+
 // Create connection pool
 const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'educational_analytics',
+    ...dbConfig,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
